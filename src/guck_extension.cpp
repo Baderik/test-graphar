@@ -33,7 +33,7 @@ static void LoadInternal(ExtensionLoader &loader) {
 
 	// Register another scalar function
 	auto guck_openssl_version_scalar_function = ScalarFunction("guck_openssl_version", {LogicalType::VARCHAR},
-	                                                            LogicalType::VARCHAR, GuckOpenSSLVersionScalarFun);
+	                                                           LogicalType::VARCHAR, GuckOpenSSLVersionScalarFun);
 	loader.RegisterFunction(guck_openssl_version_scalar_function);
 }
 
