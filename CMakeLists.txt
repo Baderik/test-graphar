@@ -29,6 +29,7 @@ include(ExternalProject)
 
 # Arrow
 #log_stage("Configuring Apache Arrow...")
+message("Configuring Apache Arrow...")
 
 ExternalProject_Add(
         arrow
@@ -40,7 +41,6 @@ ExternalProject_Add(
         -DARROW_BUILD_SHARED=OFF
         -DARROW_BUILD_STATIC=ON
         -DARROW_BUILD_TESTS=OFF
-        -DARROW_BUILD_BENCHMARKS=OFF
         -DARROW_DEPENDENCY_SOURCE=BUNDLED
         -DARROW_COMPUTE=ON
         -DARROW_DATASET=ON
@@ -48,11 +48,9 @@ ExternalProject_Add(
         -DARROW_PARQUET=ON
         -DARROW_JSON=ON
         -DARROW_CSV=ON
-        -DARROW_WITH_ZLIB=ON
-        -DARROW_WITH_ZSTD=ON
-        -DARROW_WITH_SNAPPY=ON
-        -DARROW_TESTING=OFF
-        BUILD_ALWAYS OFF
+#        -DARROW_WITH_ZLIB=ON
+#        -DARROW_WITH_ZSTD=ON
+#        -DARROW_WITH_SNAPPY=ON
         INSTALL_DIR ${ARROW_INSTALL_DIR}
         BUILD_BYPRODUCTS ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}
 )
@@ -69,6 +67,7 @@ add_dependencies(arrow::arrow_static arrow)
 
 # GraphAr
 #log_stage("Setting up GraphAR...")
+message("Setting up GraphAR...")
 
 # Сначала объявим ExternalProject
 ExternalProject_Add(
