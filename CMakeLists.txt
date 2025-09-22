@@ -128,7 +128,8 @@ include_directories(src/include)
 set(EXTENSION_SOURCES src/guck_extension.cpp
         src/functions/table/hop.cpp
         src/utils/func.cpp
-        src/utils/global_log_manager.cpp)
+        src/utils/global_log_manager.cpp
+        src/utils/benchmark.cpp)
 
 # Убедитесь, что эти функции определены (они должны быть предоставлены DuckDB)
 if(NOT COMMAND build_static_extension)
