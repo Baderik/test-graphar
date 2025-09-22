@@ -38,8 +38,8 @@ ExternalProject_Add(
         SOURCE_SUBDIR cpp
         CMAKE_ARGS
         -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-        -DARROW_BUILD_SHARED=ON
-        -DARROW_BUILD_STATIC=OFF
+        -DARROW_BUILD_SHARED=OFF
+        -DARROW_BUILD_STATIC=ON
         -DARROW_BUILD_TESTS=OFF
         -DARROW_BUILD_BENCHMARKS=OFF
         -DARROW_BUILD_EXAMPLES=OFF
@@ -65,6 +65,7 @@ ExternalProject_Add(
         -DARROW_RPATH_ORIGIN=ON
         BUILD_ALWAYS OFF
         INSTALL_DIR ${ARROW_INSTALL_DIR}
+        BUILD_BYPRODUCTS ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}
 )
 
 add_library(arrow::arrow_static STATIC IMPORTED GLOBAL)
@@ -90,6 +91,7 @@ ExternalProject_Add(
         CMAKE_ARGS
         -DGRAPHAR_BUILD_STATIC=ON
         -DUSE_STATIC_ARROW=ON
+        -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}
         -DCMAKE_INSTALL_PREFIX=${GRAPHAR_INSTALL_DIR}
         -DCMAKE_BUILD_TYPE=Release
         INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
@@ -101,6 +103,8 @@ ExternalProject_Add(
 add_library(graphar::graphar_static STATIC IMPORTED)
 set_target_properties(graphar::graphar_static PROPERTIES
         IMPORTED_LOCATION ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
+        INTERFACE_INCLUDE_DIRECTORIES "${GRAPHAR_INSTALL_DIR}/include"
+        INTERFACE_LINK_LIBRARIES "arrow::arrow_static"
         )
 
 # Добавляем зависимость, чтобы GraphAR собирался до основного проекта
