@@ -86,6 +86,8 @@ ExternalProject_Add(
         -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}
         -DCMAKE_INSTALL_PREFIX=${GRAPHAR_INSTALL_DIR}
         -DCMAKE_BUILD_TYPE=Release
+        -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
+        -DProtobuf_LIBRARIES=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/lib/libprotobuf${CMAKE_STATIC_LIBRARY_SUFFIX}
         INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
         BUILD_BYPRODUCTS ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
         DEPENDS arrow
