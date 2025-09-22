@@ -7,7 +7,6 @@ set(TARGET_NAME guck)
 # used in cmake with find_package. Feel free to remove or replace with other dependencies.
 # Note that it should also be removed from vcpkg.json to prevent needlessly installing it..
 find_package(OpenSSL REQUIRED)
-find_package(CURL REQUIRED)
 
 # =============================================
 # Dependency Management
@@ -47,18 +46,17 @@ ExternalProject_Add(
         -DARROW_BUILD_STATIC=ON
         -DARROW_BUILD_TESTS=OFF
         -DARROW_DEPENDENCY_SOURCE=BUNDLED
-        -DARROW_OPTIONAL_INSTALL=ON
         -DARROW_COMPUTE=ON
         -DARROW_DATASET=ON
         -DARROW_FILESYSTEM=ON
-        -DARROW_S3=ON
+        -DARROW_S3=OFF
         -DARROW_PARQUET=ON
         -DARROW_ORC=ON
         -DARROW_JSON=ON
         -DARROW_CSV=ON
-        -DARROW_WITH_ZLIB=ON
+        -DARROW_WITH_ZLIB=OFF
         -DARROW_WITH_ZSTD=ON
-        -DARROW_WITH_SNAPPY=ON
+        -DARROW_WITH_SNAPPY=OFF
         INSTALL_DIR ${ARROW_INSTALL_DIR}
         BUILD_BYPRODUCTS ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}
 )
