@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)  # Обновите минимальную версию
 
 # Set extension name here
 set(TARGET_NAME guck)
@@ -28,31 +28,36 @@ include(GNUInstallDirs)
 include(ExternalProject)
 
 # GraphAr
-
 #log_stage("Setting up GraphAR...")
 
+# Сначала объявим ExternalProject
 ExternalProject_Add(
         graphar
         PREFIX ${GRAPHAR_PREFIX_DIR}
         GIT_REPOSITORY https://github.com/apache/incubator-graphar.git
-        # GIT_TAG main
         GIT_TAG 1a44bc343e0e846df129c78152f6310a1d678429
         SOURCE_SUBDIR cpp
         CMAKE_ARGS
         -DGRAPHAR_BUILD_STATIC=ON
         -DBUILD_ARROW_FROM_SOURCE=ON
         -DCMAKE_INSTALL_PREFIX=${GRAPHAR_INSTALL_DIR}
+        -DCMAKE_BUILD_TYPE=Release
         INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
+        BUILD_BYPRODUCTS ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
 )
 
-add_library(graphar::graphar_static STATIC IMPORTED GLOBAL)
-
+# Создаем импортированную цель
+add_library(graphar::graphar_static STATIC IMPORTED)
 set_target_properties(graphar::graphar_static PROPERTIES
-        IMPORTED_LOCATION "${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}"
+        IMPORTED_LOCATION ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
         )
 
+# Добавляем зависимость, чтобы GraphAR собирался до основного проекта
 add_dependencies(graphar::graphar_static graphar)
 
+# Включаем директории для заголовочных файлов
+file(MAKE_DIRECTORY ${GRAPHAR_INSTALL_DIR}/include)
+target_include_directories(graphar::graphar_static INTERFACE ${GRAPHAR_INSTALL_DIR}/include)
 
 set(EXTENSION_NAME ${TARGET_NAME}_extension)
 set(LOADABLE_EXTENSION_NAME ${TARGET_NAME}_loadable_extension)
@@ -62,19 +67,45 @@ include_directories(src/include)
 
 set(EXTENSION_SOURCES src/guck_extension.cpp)
 
+# Убедитесь, что эти функции определены (они должны быть предоставлены DuckDB)
+if(NOT COMMAND build_static_extension)
+    message(FATAL_ERROR "build_static_extension function not found")
+endif()
+
+if(NOT COMMAND build_loadable_extension)
+    message(FATAL_ERROR "build_loadable_extension function not found")
+endif()
+
 build_static_extension(${TARGET_NAME} ${EXTENSION_SOURCES})
 build_loadable_extension(${TARGET_NAME} " " ${EXTENSION_SOURCES})
 
 # Link OpenSSL in both the static library as the loadable extension
-target_link_libraries(${EXTENSION_NAME} OpenSSL::SSL OpenSSL::Crypto graphar::graphar_static)
-target_link_libraries(${LOADABLE_EXTENSION_NAME} OpenSSL::SSL OpenSSL::Crypto graphar::graphar_static)
+# Добавляем зависимости, чтобы GraphAR собирался первым
+add_dependencies(${EXTENSION_NAME} graphar::graphar_static)
+add_dependencies(${LOADABLE_EXTENSION_NAME} graphar::graphar_static)
+
+target_link_libraries(${EXTENSION_NAME}
+        OpenSSL::SSL
+        OpenSSL::Crypto
+        graphar::graphar_static
+        )
+
+target_link_libraries(${LOADABLE_EXTENSION_NAME}
+        OpenSSL::SSL
+        OpenSSL::Crypto
+        graphar::graphar_static
+        )
+
+# Добавляем include директории
+target_include_directories(${EXTENSION_NAME} PRIVATE ${GRAPHAR_INSTALL_DIR}/include)
+target_include_directories(${LOADABLE_EXTENSION_NAME} PRIVATE ${GRAPHAR_INSTALL_DIR}/include)
 
 message("!!! libs here ${INSTALL_LIB_DIR}")
 
 list(APPEND INSTALL_LIB_DIR "${GRAPHAR_LIB_DIR}")
 
 install(
-  TARGETS ${EXTENSION_NAME}
-  EXPORT "${DUCKDB_EXPORT_SET}"
-  LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
-  ARCHIVE DESTINATION "${INSTALL_LIB_DIR}")
+        TARGETS ${EXTENSION_NAME}
+        EXPORT "${DUCKDB_EXPORT_SET}"
+        LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
+        ARCHIVE DESTINATION "${INSTALL_LIB_DIR}")
