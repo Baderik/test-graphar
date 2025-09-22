@@ -38,6 +38,7 @@ ExternalProject_Add(
         GIT_TAG apache-arrow-21.0.0
         SOURCE_SUBDIR cpp
         CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX=${ARROW_INSTALL_DIR}
         -DARROW_BUILD_SHARED=OFF
         -DARROW_BUILD_STATIC=ON
         -DARROW_BUILD_TESTS=OFF
