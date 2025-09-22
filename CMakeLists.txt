@@ -71,6 +71,8 @@ target_link_libraries(${LOADABLE_EXTENSION_NAME} OpenSSL::SSL OpenSSL::Crypto gr
 
 message("!!! libs here ${INSTALL_LIB_DIR}")
 
+list(APPEND INSTALL_LIB_DIR "${GRAPHAR_LIB_DIR}")
+
 install(
   TARGETS ${EXTENSION_NAME}
   EXPORT "${DUCKDB_EXPORT_SET}"
