@@ -1,9 +1,13 @@
 #define DUCKDB_EXTENSION_MAIN
 
 #include "guck_extension.hpp"
-#include "duckdb.hpp"
-#include "duckdb/common/exception.hpp"
-#include "duckdb/function/scalar_function.hpp"
+
+#include "functions/table/hop.hpp"
+#include "utils/global_log_manager.hpp"
+
+#include <duckdb/common/exception.hpp>
+#include <duckdb/common/string_util.hpp>
+#include <duckdb/function/scalar_function.hpp>
 #include <duckdb/parser/parsed_data/create_scalar_function_info.hpp>
 
 // OpenSSL linked through vcpkg
@@ -35,6 +39,8 @@ static void LoadInternal(ExtensionLoader &loader) {
 	auto guck_openssl_version_scalar_function = ScalarFunction("guck_openssl_version", {LogicalType::VARCHAR},
 	                                                           LogicalType::VARCHAR, GuckOpenSSLVersionScalarFun);
 	loader.RegisterFunction(guck_openssl_version_scalar_function);
+	GlobalLogManager::Initialize(loader.GetDatabaseInstance());
+	TwoHop::Register(loader);
 }
 
 void GuckExtension::Load(ExtensionLoader &loader) {

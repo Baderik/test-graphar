@@ -9,6 +9,14 @@ set(TARGET_NAME guck)
 find_package(OpenSSL REQUIRED)
 
 # =============================================
+# Core Configuration
+# =============================================
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# =============================================
 # Dependency Management
 # =============================================
 set(DEPS_INSTALL_DIR ${CMAKE_BINARY_DIR}/_deps)
@@ -54,9 +62,9 @@ ExternalProject_Add(
         -DARROW_ORC=ON
         -DARROW_JSON=ON
         -DARROW_CSV=ON
-        -DARROW_WITH_ZLIB=OFF
+        -DARROW_WITH_ZLIB=ON
         -DARROW_WITH_ZSTD=ON
-        -DARROW_WITH_SNAPPY=OFF
+        -DARROW_WITH_SNAPPY=ON
         INSTALL_DIR ${ARROW_INSTALL_DIR}
         BUILD_BYPRODUCTS ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}
 )
@@ -117,7 +125,10 @@ set(LOADABLE_EXTENSION_NAME ${TARGET_NAME}_loadable_extension)
 project(${TARGET_NAME})
 include_directories(src/include)
 
-set(EXTENSION_SOURCES src/guck_extension.cpp)
+set(EXTENSION_SOURCES src/guck_extension.cpp
+        src/functions/table/hop.cpp
+        src/utils/func.cpp
+        src/utils/global_log_manager.cpp)
 
 # Убедитесь, что эти функции определены (они должны быть предоставлены DuckDB)
 if(NOT COMMAND build_static_extension)
