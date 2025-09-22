@@ -39,17 +39,17 @@ ExternalProject_Add(
         GIT_TAG 1a44bc343e0e846df129c78152f6310a1d678429
         SOURCE_SUBDIR cpp
         CMAKE_ARGS
+        -DGRAPHAR_BUILD_STATIC=ON
+        -DBUILD_ARROW_FROM_SOURCE=ON
         -DCMAKE_INSTALL_PREFIX=${GRAPHAR_INSTALL_DIR}
         INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
-        -DGRAPHAR_BUILD_STATIC=ON
-        -DBUILD_ARROW_FROM_SOURCE=ON ..
 )
 
 add_library(graphar::graphar_static STATIC IMPORTED GLOBAL)
 
-#set_target_properties(graphar::graphar_static PROPERTIES
-#        IMPORTED_LOCATION "${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}"
-#        )
+set_target_properties(graphar::graphar_static PROPERTIES
+        IMPORTED_LOCATION "${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}"
+        )
 
 add_dependencies(graphar::graphar_static graphar)
 
@@ -68,6 +68,8 @@ build_loadable_extension(${TARGET_NAME} " " ${EXTENSION_SOURCES})
 # Link OpenSSL in both the static library as the loadable extension
 target_link_libraries(${EXTENSION_NAME} OpenSSL::SSL OpenSSL::Crypto graphar::graphar_static)
 target_link_libraries(${LOADABLE_EXTENSION_NAME} OpenSSL::SSL OpenSSL::Crypto graphar::graphar_static)
+
+message("!!! libs here ${INSTALL_LIB_DIR}")
 
 install(
   TARGETS ${EXTENSION_NAME}
