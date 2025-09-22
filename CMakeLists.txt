@@ -27,6 +27,56 @@ include(FetchContent)
 include(GNUInstallDirs)
 include(ExternalProject)
 
+# Arrow
+#log_stage("Configuring Apache Arrow...")
+
+ExternalProject_Add(
+        arrow
+        PREFIX ${ARROW_PREFIX_DIR}
+        GIT_REPOSITORY https://github.com/apache/arrow.git
+        GIT_TAG apache-arrow-17.0.0
+        SOURCE_SUBDIR cpp
+        CMAKE_ARGS
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+        -DARROW_BUILD_SHARED=ON
+        -DARROW_BUILD_STATIC=OFF
+        -DARROW_BUILD_TESTS=OFF
+        -DARROW_BUILD_BENCHMARKS=OFF
+        -DARROW_BUILD_EXAMPLES=OFF
+        -DARROW_DEPENDENCY_SOURCE=BUNDLED
+        -DARROW_OPTIONAL_INSTALL=ON
+        -DARROW_COMPUTE=ON
+        -DARROW_DATASET=ON
+        -DARROW_FILESYSTEM=ON
+        -DARROW_S3=ON
+        -DARROW_PARQUET=ON
+        -DARROW_ORC=ON
+        -DARROW_JSON=ON
+        -DARROW_WITH_ZLIB=ON
+        -DARROW_WITH_ZSTD=ON
+        -DARROW_WITH_BROTLI=OFF
+        -DARROW_WITH_BZ2=OFF
+        -DARROW_WITH_LZ4=OFF
+        -DARROW_WITH_SNAPPY=ON
+        -DARROW_CSV=ON
+        -DARROW_GANDIVA=OFF
+        -DARROW_TESTING=OFF
+        -DCMAKE_INSTALL_PREFIX=${ARROW_INSTALL_DIR}
+        -DARROW_RPATH_ORIGIN=ON
+        BUILD_ALWAYS OFF
+        INSTALL_DIR ${ARROW_INSTALL_DIR}
+)
+
+add_library(arrow::arrow_static STATIC IMPORTED GLOBAL)
+
+file(MAKE_DIRECTORY "${ARROW_INSTALL_DIR}/include")
+set_target_properties(arrow::arrow_static PROPERTIES
+        IMPORTED_LOCATION "${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}"
+        INTERFACE_INCLUDE_DIRECTORIES ${ARROW_INSTALL_DIR}/include
+        )
+
+add_dependencies(arrow::arrow_static arrow)
+
 # GraphAr
 #log_stage("Setting up GraphAR...")
 
@@ -39,11 +89,12 @@ ExternalProject_Add(
         SOURCE_SUBDIR cpp
         CMAKE_ARGS
         -DGRAPHAR_BUILD_STATIC=ON
-        -DBUILD_ARROW_FROM_SOURCE=ON
+        -DUSE_STATIC_ARROW=ON
         -DCMAKE_INSTALL_PREFIX=${GRAPHAR_INSTALL_DIR}
         -DCMAKE_BUILD_TYPE=Release
         INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
         BUILD_BYPRODUCTS ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
+        DEPENDS arrow
 )
 
 # Создаем импортированную цель
