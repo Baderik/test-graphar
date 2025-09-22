@@ -1,0 +1,37 @@
+#pragma once
+
+#include <duckdb/common/types.hpp>
+#include <duckdb/common/types/value.hpp>
+
+#include <chrono>
+#include <duckdb.hpp>
+#include <string>
+
+namespace duckdb {
+
+class ScopedTimer {
+	std::chrono::time_point<std::chrono::high_resolution_clock> start, last;
+	std::string name;
+
+public:
+	explicit ScopedTimer(const std::string& name);
+	~ScopedTimer() {};
+
+	void print(const std::string& msg, bool all = false);
+	void print() { print("", true); };
+};
+
+struct GraphArSettings {
+	template <typename T>
+	static T get(const ClientContext& context, const std::string& name) {
+		Value result;
+		(void)context.TryGetCurrentSetting(name, result);
+		if (!result.IsNull()) {
+			return !result.IsNull() && result.GetValue<T>();
+		}
+		return T();
+	}
+
+	static bool is_time_logging(const ClientContext& context) { return get<bool>(context, "graphar_time_logging"); }
+};
+}  // namespace duckdb
