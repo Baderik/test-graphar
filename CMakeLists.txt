@@ -7,6 +7,7 @@ set(TARGET_NAME guck)
 # used in cmake with find_package. Feel free to remove or replace with other dependencies.
 # Note that it should also be removed from vcpkg.json to prevent needlessly installing it..
 find_package(OpenSSL REQUIRED)
+find_package(CURL REQUIRED)
 
 # =============================================
 # Dependency Management
