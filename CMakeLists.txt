@@ -47,9 +47,9 @@ ExternalProject_Add(
 
 add_library(graphar::graphar_static STATIC IMPORTED GLOBAL)
 
-set_target_properties(graphar::graphar_static PROPERTIES
-        IMPORTED_LOCATION "${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}"
-        )
+#set_target_properties(graphar::graphar_static PROPERTIES
+#        IMPORTED_LOCATION "${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}"
+#        )
 
 add_dependencies(graphar::graphar_static graphar)
 
