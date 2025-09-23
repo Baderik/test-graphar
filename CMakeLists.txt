@@ -8,7 +8,7 @@ set(TARGET_NAME guck)
 # Note that it should also be removed from vcpkg.json to prevent needlessly installing it..
 #find_package(OpenSSL REQUIRED)
 #find_package(CURL REQUIRED)
-find_package(CURL REQUIRED GLOBAL)
+#find_package(CURL REQUIRED GLOBAL)
 #message(STATUS "Found CURL: ${CURL_VERSION}")
 #find_package(ZLIB REQUIRED)
 #find_package(ZSTD REQUIRED)
@@ -51,15 +51,15 @@ include(ExternalProject)
 # =============================================
 # Setup global CURL target
 # =============================================
-#set(CURL_ROOT /opt/homebrew/opt/curl)
-#set(CURL_INCLUDE_DIR ${CURL_ROOT}/include)
-#set(CURL_LIBRARY ${CURL_ROOT}/lib/libcurl.dylib)
-#
-#add_library(CURL::libcurl UNKNOWN IMPORTED GLOBAL)
-#set_target_properties(CURL::libcurl PROPERTIES
-#        IMPORTED_LOCATION ${CURL_LIBRARY}
-#        INTERFACE_INCLUDE_DIRECTORIES ${CURL_INCLUDE_DIR}
-#        )
+set(CURL_ROOT /opt/homebrew/opt/curl)
+set(CURL_INCLUDE_DIR ${CURL_ROOT}/include)
+set(CURL_LIBRARY ${CURL_ROOT}/lib/libcurl.dylib)
+
+add_library(CURL::libcurl UNKNOWN IMPORTED GLOBAL)
+set_target_properties(CURL::libcurl PROPERTIES
+        IMPORTED_LOCATION ${CURL_LIBRARY}
+        INTERFACE_INCLUDE_DIRECTORIES ${CURL_INCLUDE_DIR}
+        )
 
 # Arrow
 #log_stage("Configuring Apache Arrow...")
@@ -129,8 +129,8 @@ ExternalProject_Add(
         -DGRAPHAR_BUILD_STATIC=ON
         -DUSE_STATIC_ARROW=ON
         -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}
-#        -DCURL_INCLUDE_DIR=/opt/homebrew/opt/curl/include
-#        -DCURL_LIBRARY=/opt/homebrew/opt/curl/lib/libcurl.dylib
+        -DCURL_INCLUDE_DIR=/opt/homebrew/opt/curl/include
+        -DCURL_LIBRARY=/opt/homebrew/opt/curl/lib/libcurl.dylib
         -DCMAKE_INSTALL_PREFIX=${GRAPHAR_INSTALL_DIR}
         -DCMAKE_BUILD_TYPE=Release
         -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
@@ -187,8 +187,8 @@ build_loadable_extension(${TARGET_NAME} " " ${EXTENSION_SOURCES})
 
 # Link OpenSSL in both the static library as the loadable extension
 # Добавляем зависимости, чтобы GraphAR собирался первым
-add_dependencies(${EXTENSION_NAME} graphar::graphar_static)
-add_dependencies(${LOADABLE_EXTENSION_NAME} graphar::graphar_static)
+add_dependencies(${EXTENSION_NAME} arrow::arrow_static graphar::graphar_static)
+add_dependencies(${LOADABLE_EXTENSION_NAME} arrow::arrow_static graphar::graphar_static)
 
 target_link_libraries(${EXTENSION_NAME}
 #        OpenSSL::SSL
