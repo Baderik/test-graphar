@@ -1,14 +1,24 @@
 cmake_minimum_required(VERSION 3.10)  # Обновите минимальную версию
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
 # Set extension name here
 set(TARGET_NAME guck)
 
 # DuckDB's extension distribution supports vcpkg. As such, dependencies can be added in ./vcpkg.json and then
 # used in cmake with find_package. Feel free to remove or replace with other dependencies.
 # Note that it should also be removed from vcpkg.json to prevent needlessly installing it..
-find_package(OpenSSL REQUIRED)
+#find_package(OpenSSL REQUIRED)
+#find_package(CURL REQUIRED)
+find_package(CURL REQUIRED)
+#message(STATUS "Found CURL: ${CURL_VERSION}")
+#find_package(ZLIB REQUIRED)
+#find_package(ZSTD REQUIRED)
+#find_package(SNAPPY REQUIRED)
+#find_package(LZ4 REQUIRED)
+#find_package(Zstd REQUIRED)
+#find_package(Snappy REQUIRED)
+#find_package(ZLIB REQUIRED)
+#find_package(mimalloc REQUIRED)
+
 
 # =============================================
 # Core Configuration
@@ -42,12 +52,12 @@ include(ExternalProject)
 message("Configuring Apache Arrow...")
 
 ExternalProject_Add(
-        arrow
-        PREFIX ${ARROW_PREFIX_DIR}
-        GIT_REPOSITORY https://github.com/apache/arrow.git
-        GIT_TAG apache-arrow-21.0.0
-        SOURCE_SUBDIR cpp
-        CMAKE_ARGS
+    arrow
+    PREFIX ${ARROW_PREFIX_DIR}
+    GIT_REPOSITORY https://github.com/apache/arrow.git
+    GIT_TAG apache-arrow-21.0.0
+    SOURCE_SUBDIR cpp
+    CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX=${ARROW_INSTALL_DIR}
         -DCMAKE_INSTALL_LIBDIR=${ARROW_INSTALL_DIR}/lib
         -DCMAKE_INSTALL_INCLUDEDIR=${ARROW_INSTALL_DIR}/include
@@ -59,16 +69,19 @@ ExternalProject_Add(
         -DARROW_COMPUTE=ON
         -DARROW_DATASET=ON
         -DARROW_FILESYSTEM=ON
-        -DARROW_S3=OFF
+        -DARROW_S3=ON
         -DARROW_PARQUET=ON
         -DARROW_ORC=ON
         -DARROW_JSON=ON
         -DARROW_CSV=ON
         -DARROW_WITH_ZLIB=ON
         -DARROW_WITH_ZSTD=ON
+        -DARROW_WITH_LZ4=ON
         -DARROW_WITH_SNAPPY=ON
-        INSTALL_DIR ${ARROW_INSTALL_DIR}
-        BUILD_BYPRODUCTS ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}
+        -DARROW_WITH_MIMALLOC=ON
+        -DARROW_DEPENDENCY_USE_SHARED=OFF
+    INSTALL_DIR ${ARROW_INSTALL_DIR}
+    BUILD_BYPRODUCTS ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}
 )
 
 add_library(arrow::arrow_static STATIC IMPORTED GLOBAL)
@@ -77,6 +90,7 @@ file(MAKE_DIRECTORY "${ARROW_INSTALL_DIR}/include")
 set_target_properties(arrow::arrow_static PROPERTIES
         IMPORTED_LOCATION "${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}"
         INTERFACE_INCLUDE_DIRECTORIES ${ARROW_INSTALL_DIR}/include
+#        INTERFACE_LINK_LIBRARIES "CURL::libcurl"
         )
 
 add_dependencies(arrow::arrow_static arrow)
@@ -95,7 +109,9 @@ ExternalProject_Add(
     CMAKE_ARGS
         -DGRAPHAR_BUILD_STATIC=ON
         -DUSE_STATIC_ARROW=ON
-        -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}
+        -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR};/opt/homebrew/opt/curl
+        -DCURL_INCLUDE_DIR=/opt/homebrew/opt/curl/include
+        -DCURL_LIBRARY=/opt/homebrew/opt/curl/lib/libcurl.dylib
         -DCMAKE_INSTALL_PREFIX=${GRAPHAR_INSTALL_DIR}
         -DCMAKE_BUILD_TYPE=Release
         -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
@@ -103,6 +119,8 @@ ExternalProject_Add(
         -DProtobuf_VERSION=21.3.0
         -DCMAKE_CXX_FLAGS=-fPIC
         -DCMAKE_C_FLAGS=-fPIC
+        -DARROW_ORC=ON
+#        -DCURL_ROOT=${CURL_ROOT}
     INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
     BUILD_BYPRODUCTS ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
     DEPENDS arrow
@@ -154,15 +172,37 @@ add_dependencies(${EXTENSION_NAME} graphar::graphar_static)
 add_dependencies(${LOADABLE_EXTENSION_NAME} graphar::graphar_static)
 
 target_link_libraries(${EXTENSION_NAME}
-        OpenSSL::SSL
-        OpenSSL::Crypto
+#        OpenSSL::SSL
+#        OpenSSL::Crypto
         graphar::graphar_static
+        ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX}
+        ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX}
+        ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX}
+        ${ARROW_LIB_DIR}/libarrow_dataset${CMAKE_STATIC_LIBRARY_SUFFIX}
+        ${ARROW_LIB_DIR}/libparquet${CMAKE_STATIC_LIBRARY_SUFFIX}
+#        lz4
+#        zstd
+#        snappy
+#        z
+#        mimalloc
+#        CURL::libcurl
         )
 
 target_link_libraries(${LOADABLE_EXTENSION_NAME}
-        OpenSSL::SSL
-        OpenSSL::Crypto
+#        OpenSSL::SSL
+#        OpenSSL::Crypto
         graphar::graphar_static
+        ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX}
+        ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX}
+        ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX}
+        ${ARROW_LIB_DIR}/libarrow_dataset${CMAKE_STATIC_LIBRARY_SUFFIX}
+        ${ARROW_LIB_DIR}/libparquet${CMAKE_STATIC_LIBRARY_SUFFIX}
+#        lz4
+#        zstd
+#        snappy
+#        z
+#        mimalloc
+#        CURL::libcurl
         )
 
 # Добавляем include директории
@@ -171,7 +211,7 @@ target_include_directories(${LOADABLE_EXTENSION_NAME} PRIVATE ${GRAPHAR_INSTALL_
 
 message("!!! libs here ${INSTALL_LIB_DIR}")
 
-list(APPEND INSTALL_LIB_DIR "${GRAPHAR_LIB_DIR}")
+#list(APPEND INSTALL_LIB_DIR "${GRAPHAR_LIB_DIR}")
 
 install(
         TARGETS ${EXTENSION_NAME}

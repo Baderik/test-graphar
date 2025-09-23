@@ -11,7 +11,7 @@
 #include <duckdb/parser/parsed_data/create_scalar_function_info.hpp>
 
 // OpenSSL linked through vcpkg
-#include <openssl/opensslv.h>
+//#include <openssl/opensslv.h>
 
 namespace duckdb {
 
@@ -22,13 +22,13 @@ inline void GuckScalarFun(DataChunk &args, ExpressionState &state, Vector &resul
 	});
 }
 
-inline void GuckOpenSSLVersionScalarFun(DataChunk &args, ExpressionState &state, Vector &result) {
-	auto &name_vector = args.data[0];
-	UnaryExecutor::Execute<string_t, string_t>(name_vector, result, args.size(), [&](string_t name) {
-		return StringVector::AddString(result, "Guck " + name.GetString() + ", my linked OpenSSL version is " +
-		                                           OPENSSL_VERSION_TEXT);
-	});
-}
+//inline void GuckOpenSSLVersionScalarFun(DataChunk &args, ExpressionState &state, Vector &result) {
+//	auto &name_vector = args.data[0];
+//	UnaryExecutor::Execute<string_t, string_t>(name_vector, result, args.size(), [&](string_t name) {
+//		return StringVector::AddString(result, "Guck " + name.GetString() + ", my linked OpenSSL version is " +
+//		                                           OPENSSL_VERSION_TEXT);
+//	});
+//}
 
 static void LoadInternal(ExtensionLoader &loader) {
 	// Register a scalar function
@@ -36,9 +36,9 @@ static void LoadInternal(ExtensionLoader &loader) {
 	loader.RegisterFunction(guck_scalar_function);
 
 	// Register another scalar function
-	auto guck_openssl_version_scalar_function = ScalarFunction("guck_openssl_version", {LogicalType::VARCHAR},
-	                                                           LogicalType::VARCHAR, GuckOpenSSLVersionScalarFun);
-	loader.RegisterFunction(guck_openssl_version_scalar_function);
+//	auto guck_openssl_version_scalar_function = ScalarFunction("guck_openssl_version", {LogicalType::VARCHAR},
+//	                                                           LogicalType::VARCHAR, GuckOpenSSLVersionScalarFun);
+//	loader.RegisterFunction(guck_openssl_version_scalar_function);
 	GlobalLogManager::Initialize(loader.GetDatabaseInstance());
 	TwoHop::Register(loader);
 }
