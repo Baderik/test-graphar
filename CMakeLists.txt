@@ -194,7 +194,7 @@ target_link_libraries(${EXTENSION_NAME}
 #        OpenSSL::SSL
 #        OpenSSL::Crypto
         graphar::graphar_static
-        CURL::libcurl
+#        CURL::libcurl
         ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX}
         ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX}
         ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX}
@@ -212,7 +212,7 @@ target_link_libraries(${LOADABLE_EXTENSION_NAME}
 #        OpenSSL::SSL
 #        OpenSSL::Crypto
         graphar::graphar_static
-        CURL::libcurl
+#        CURL::libcurl
         ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX}
         ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX}
         ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX}
