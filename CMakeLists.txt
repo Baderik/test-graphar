@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)  # Обновите минимальную версию
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # Set extension name here
 set(TARGET_NAME guck)
 
@@ -85,12 +87,12 @@ message("Setting up GraphAR...")
 
 # Сначала объявим ExternalProject
 ExternalProject_Add(
-        graphar
-        PREFIX ${GRAPHAR_PREFIX_DIR}
-        GIT_REPOSITORY https://github.com/apache/incubator-graphar.git
-        GIT_TAG 1a44bc343e0e846df129c78152f6310a1d678429
-        SOURCE_SUBDIR cpp
-        CMAKE_ARGS
+    graphar
+    PREFIX ${GRAPHAR_PREFIX_DIR}
+    GIT_REPOSITORY https://github.com/apache/incubator-graphar.git
+    GIT_TAG 1a44bc343e0e846df129c78152f6310a1d678429
+    SOURCE_SUBDIR cpp
+    CMAKE_ARGS
         -DGRAPHAR_BUILD_STATIC=ON
         -DUSE_STATIC_ARROW=ON
         -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}
@@ -99,9 +101,11 @@ ExternalProject_Add(
         -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
         -DProtobuf_LIBRARIES=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/lib/libprotobuf${CMAKE_STATIC_LIBRARY_SUFFIX}
         -DProtobuf_VERSION=21.3.0
-        INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
-        BUILD_BYPRODUCTS ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
-        DEPENDS arrow
+        -DCMAKE_CXX_FLAGS=-fPIC
+        -DCMAKE_C_FLAGS=-fPIC
+    INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
+    BUILD_BYPRODUCTS ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
+    DEPENDS arrow
 )
 
 # Создаем импортированную цель
@@ -110,6 +114,7 @@ set_target_properties(graphar::graphar_static PROPERTIES
         IMPORTED_LOCATION ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
         INTERFACE_INCLUDE_DIRECTORIES "${GRAPHAR_INSTALL_DIR}/include"
         INTERFACE_LINK_LIBRARIES "arrow::arrow_static"
+        POSITION_INDEPENDENT_CODE ON
         )
 
 # Добавляем зависимость, чтобы GraphAR собирался до основного проекта
