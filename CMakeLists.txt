@@ -9,7 +9,9 @@ set(TARGET_NAME guck)
 #find_package(OpenSSL REQUIRED)
 #find_package(CURL REQUIRED)
 #find_package(CURL REQUIRED GLOBAL)
-#message(STATUS "Found CURL: ${CURL_VERSION}")
+#message("(:-) Found CURL: ${CURL_VERSION}")
+#message("(:-) Found CURL: ${DCURL_INCLUDE_DIR}")
+#message("(:-) Found CURL: ${CURL_INCLUDE_DIR}")
 #find_package(ZLIB REQUIRED)
 #find_package(ZSTD REQUIRED)
 #find_package(SNAPPY REQUIRED)
@@ -51,15 +53,15 @@ include(ExternalProject)
 # =============================================
 # Setup global CURL target
 # =============================================
-set(CURL_ROOT /opt/homebrew/opt/curl)
-set(CURL_INCLUDE_DIR ${CURL_ROOT}/include)
-set(CURL_LIBRARY ${CURL_ROOT}/lib/libcurl.dylib)
-
-add_library(CURL::libcurl UNKNOWN IMPORTED GLOBAL)
-set_target_properties(CURL::libcurl PROPERTIES
-        IMPORTED_LOCATION ${CURL_LIBRARY}
-        INTERFACE_INCLUDE_DIRECTORIES ${CURL_INCLUDE_DIR}
-        )
+#set(CURL_ROOT /opt/homebrew/opt/curl)
+#set(CURL_INCLUDE_DIR ${CURL_ROOT}/include)
+#set(CURL_LIBRARY ${CURL_ROOT}/lib/libcurl.dylib)
+#
+#add_library(CURL::libcurl UNKNOWN IMPORTED GLOBAL)
+#set_target_properties(CURL::libcurl PROPERTIES
+#        IMPORTED_LOCATION ${CURL_LIBRARY}
+#        INTERFACE_INCLUDE_DIRECTORIES ${CURL_INCLUDE_DIR}
+#        )
 
 # Arrow
 #log_stage("Configuring Apache Arrow...")
@@ -83,7 +85,7 @@ ExternalProject_Add(
         -DARROW_COMPUTE=ON
         -DARROW_DATASET=ON
         -DARROW_FILESYSTEM=ON
-        -DARROW_S3=ON
+        -DARROW_S3=OFF
         -DARROW_PARQUET=ON
         -DARROW_ORC=ON
         -DARROW_JSON=ON
@@ -94,9 +96,9 @@ ExternalProject_Add(
         -DARROW_WITH_SNAPPY=ON
         -DARROW_WITH_MIMALLOC=ON
         -DARROW_DEPENDENCY_USE_SHARED=OFF
-        -DARROW_WITH_CURL=ON
-        -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIR}
-        -DCURL_LIBRARY=${CURL_LIBRARY}
+#        -DARROW_WITH_CURL=ON
+#        -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIR}
+#        -DCURL_LIBRARY=${CURL_LIBRARY}
     INSTALL_DIR ${ARROW_INSTALL_DIR}
     BUILD_BYPRODUCTS ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_dataset${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libparquet${CMAKE_STATIC_LIBRARY_SUFFIX}
 )
@@ -128,21 +130,23 @@ ExternalProject_Add(
     CMAKE_ARGS
         -DGRAPHAR_BUILD_STATIC=ON
         -DUSE_STATIC_ARROW=ON
-        -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}
-        -DCURL_INCLUDE_DIR=/opt/homebrew/opt/curl/include
-        -DCURL_LIBRARY=/opt/homebrew/opt/curl/lib/libcurl.dylib
+#        -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}
+#        -DCURL_INCLUDE_DIR=/opt/homebrew/opt/curl/include
+#        -DCURL_LIBRARY=/opt/homebrew/opt/curl/lib/libcurl.dylib
         -DCMAKE_INSTALL_PREFIX=${GRAPHAR_INSTALL_DIR}
         -DCMAKE_BUILD_TYPE=Release
-        -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
-        -DProtobuf_LIBRARIES=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/lib/libprotobuf${CMAKE_STATIC_LIBRARY_SUFFIX}
-        -DProtobuf_VERSION=21.3.0
+#        -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
+#        -DProtobuf_LIBRARIES=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/lib/libprotobuf${CMAKE_STATIC_LIBRARY_SUFFIX}
+#        -DProtobuf_VERSION=21.3.0
         -DCMAKE_CXX_FLAGS=-fPIC
         -DCMAKE_C_FLAGS=-fPIC
-        -DARROW_ORC=ON
+#        -DARROW_ORC=ON
+#        -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIR}
 #        -DCURL_ROOT=${CURL_ROOT}
+        -DBUILD_ARROW_FROM_SOURCE=ON
     INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
-    BUILD_BYPRODUCTS ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
-    DEPENDS arrow
+#    BUILD_BYPRODUCTS ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
+#    DEPENDS arrow
 )
 
 # Создаем импортированную цель
@@ -150,7 +154,7 @@ add_library(graphar::graphar_static STATIC IMPORTED)
 set_target_properties(graphar::graphar_static PROPERTIES
         IMPORTED_LOCATION ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
         INTERFACE_INCLUDE_DIRECTORIES "${GRAPHAR_INSTALL_DIR}/include"
-        INTERFACE_LINK_LIBRARIES "arrow::arrow_static"
+#        INTERFACE_LINK_LIBRARIES "arrow::arrow_static"
         POSITION_INDEPENDENT_CODE ON
         )
 
@@ -195,6 +199,8 @@ target_link_libraries(${EXTENSION_NAME}
 #        OpenSSL::Crypto
         graphar::graphar_static
 #        CURL::libcurl
+        arrow::arrow_static
+        ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}
         ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX}
         ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX}
         ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX}
@@ -213,6 +219,8 @@ target_link_libraries(${LOADABLE_EXTENSION_NAME}
 #        OpenSSL::Crypto
         graphar::graphar_static
 #        CURL::libcurl
+        arrow::arrow_static
+        ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}
         ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX}
         ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX}
         ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX}
