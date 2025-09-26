@@ -23,7 +23,7 @@ static void LoadInternal(ExtensionLoader &loader) {
 	// Register a scalar function
 	auto guck_scalar_function = ScalarFunction("guck", {LogicalType::VARCHAR}, LogicalType::VARCHAR, GuckScalarFun);
 	loader.RegisterFunction(guck_scalar_function);
-	Simple::Register(loader);
+	MySimple::Register(loader);
 }
 
 void GuckExtension::Load(ExtensionLoader &loader) {

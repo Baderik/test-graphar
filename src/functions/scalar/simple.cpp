@@ -10,7 +10,7 @@
 
 namespace duckdb {
 
-void Simple::Execute(DataChunk& args, ExpressionState& state, Vector& result) {
+void MySimple::Execute(DataChunk& args, ExpressionState& state, Vector& result) {
 	const auto& context = state.GetContext();
 
 	auto& arg_vector = args.data[0];
@@ -26,19 +26,19 @@ void Simple::Execute(DataChunk& args, ExpressionState& state, Vector& result) {
 			throw InvalidInputException("Failed to load GraphInfo from path: " + file_path);
 		}
 		auto graph_info = maybe_graph_info.value();
-		std::string type = graph_info->GetType();
+		std::string name = graph_info->GetName();
 
-		result_data[i] = type;
+		result_data[i] = name;
 	}
 }
 
-ScalarFunction Simple::GetFunction() {
+ScalarFunction MySimple::GetFunction() {
 	ScalarFunction scalar_func("simple", {LogicalType::VARCHAR}, LogicalType::VARCHAR, Execute);
 
 	return scalar_func;
 }
 
-void Simple::Register(ExtensionLoader& loader) {
+void MySimple::Register(ExtensionLoader& loader) {
 	loader.RegisterFunction(GetFunction());
 }
 }  // namespace duckdb
