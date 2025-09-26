@@ -32,13 +32,13 @@ void Simple::Execute(DataChunk& args, ExpressionState& state, Vector& result) {
 	}
 }
 
-ScalarFunction Bfs::GetFunction() {
+ScalarFunction Simple::GetFunction() {
 	ScalarFunction scalar_func("simple", {LogicalType::VARCHAR}, LogicalType::VARCHAR, Execute);
 
 	return scalar_func;
 }
 
-void Bfs::Register(ExtensionLoader& loader) {
-	loader.RegisterFunction(db, GetFunction());
+void Simple::Register(ExtensionLoader& loader) {
+	loader.RegisterFunction(GetFunction());
 }
 }  // namespace duckdb
