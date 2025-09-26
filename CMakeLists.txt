@@ -53,7 +53,7 @@ ExternalProject_Add(
         -DARROW_COMPUTE=ON
         -DARROW_DATASET=ON
         -DARROW_FILESYSTEM=ON
-        -DARROW_S3=OFF
+        -DARROW_S3=ON
         -DARROW_PARQUET=ON
         -DARROW_ORC=ON
         -DARROW_JSON=ON
@@ -93,6 +93,7 @@ ExternalProject_Add(
         -DGRAPHAR_BUILD_STATIC=ON
         -DUSE_STATIC_ARROW=ON
         -DCMAKE_INSTALL_PREFIX=${GRAPHAR_INSTALL_DIR}
+        -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}
         -DCMAKE_BUILD_TYPE=Release
         -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
         -DProtobuf_LIBRARIES=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/lib/libprotobuf${CMAKE_STATIC_LIBRARY_SUFFIX}
