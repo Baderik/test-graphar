@@ -100,10 +100,10 @@ ExternalProject_Add(
         -DCMAKE_CXX_FLAGS=-fPIC
         -DCMAKE_C_FLAGS=-fPIC
         -DARROW_ORC=ON
-        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
-        -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}
-        -DVCPKG_MANIFEST_DIR=${VCPKG_MANIFEST_DIR}
-        -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+#        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+#        -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}
+#        -DVCPKG_MANIFEST_DIR=${VCPKG_MANIFEST_DIR}
+#        -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
     INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
     BUILD_BYPRODUCTS ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
     DEPENDS arrow
@@ -140,7 +140,6 @@ set(EXTENSION_SOURCES src/guck_extension.cpp
 build_static_extension(${TARGET_NAME} ${EXTENSION_SOURCES})
 build_loadable_extension(${TARGET_NAME} " " ${EXTENSION_SOURCES})
 
-# Link OpenSSL in both the static library as the loadable extension
 # Добавляем зависимости, чтобы GraphAR собирался первым
 add_dependencies(${EXTENSION_NAME} arrow::arrow_static graphar::graphar_static)
 add_dependencies(${LOADABLE_EXTENSION_NAME} arrow::arrow_static graphar::graphar_static)
