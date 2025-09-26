@@ -149,7 +149,7 @@ ExternalProject_Add(
         -DVCPKG_MANIFEST_DIR=${VCPKG_MANIFEST_DIR}
         -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
     INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
-#    BUILD_BYPRODUCTS ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
+    BUILD_BYPRODUCTS ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
 #    DEPENDS arrow
 )
 
@@ -158,7 +158,7 @@ add_library(graphar::graphar_static STATIC IMPORTED)
 set_target_properties(graphar::graphar_static PROPERTIES
         IMPORTED_LOCATION ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
         INTERFACE_INCLUDE_DIRECTORIES "${GRAPHAR_INSTALL_DIR}/include"
-#        INTERFACE_LINK_LIBRARIES "arrow::arrow_static"
+        INTERFACE_LINK_LIBRARIES "arrow::arrow_static"
         POSITION_INDEPENDENT_CODE ON
         )
 
