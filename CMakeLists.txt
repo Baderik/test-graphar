@@ -67,54 +67,54 @@ include(ExternalProject)
 #log_stage("Configuring Apache Arrow...")
 message("Configuring Apache Arrow...")
 
-ExternalProject_Add(
-    arrow
-    PREFIX ${ARROW_PREFIX_DIR}
-    GIT_REPOSITORY https://github.com/apache/arrow.git
-    GIT_TAG apache-arrow-21.0.0
-    SOURCE_SUBDIR cpp
-    CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX=${ARROW_INSTALL_DIR}
-        -DCMAKE_INSTALL_LIBDIR=${ARROW_INSTALL_DIR}/lib
-        -DCMAKE_INSTALL_INCLUDEDIR=${ARROW_INSTALL_DIR}/include
-        -DCMAKE_INSTALL_BINDIR=${ARROW_INSTALL_DIR}/bin
-        -DARROW_BUILD_SHARED=OFF
-        -DARROW_BUILD_STATIC=ON
-        -DARROW_BUILD_TESTS=OFF
-        -DARROW_DEPENDENCY_SOURCE=BUNDLED
-        -DARROW_COMPUTE=ON
-        -DARROW_DATASET=ON
-        -DARROW_FILESYSTEM=ON
-        -DARROW_S3=OFF
-        -DARROW_PARQUET=ON
-        -DARROW_ORC=ON
-        -DARROW_JSON=ON
-        -DARROW_CSV=ON
-        -DARROW_WITH_ZLIB=ON
-        -DARROW_WITH_ZSTD=ON
-        -DARROW_WITH_LZ4=ON
-        -DARROW_WITH_SNAPPY=ON
-        -DARROW_WITH_MIMALLOC=ON
-        -DARROW_DEPENDENCY_USE_SHARED=OFF
-#        -DARROW_WITH_CURL=ON
-#        -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIR}
-#        -DCURL_LIBRARY=${CURL_LIBRARY}
-    INSTALL_DIR ${ARROW_INSTALL_DIR}
-    BUILD_BYPRODUCTS ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_dataset${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libparquet${CMAKE_STATIC_LIBRARY_SUFFIX}
-)
+#ExternalProject_Add(
+#    arrow
+#    PREFIX ${ARROW_PREFIX_DIR}
+#    GIT_REPOSITORY https://github.com/apache/arrow.git
+#    GIT_TAG apache-arrow-21.0.0
+#    SOURCE_SUBDIR cpp
+#    CMAKE_ARGS
+#        -DCMAKE_INSTALL_PREFIX=${ARROW_INSTALL_DIR}
+#        -DCMAKE_INSTALL_LIBDIR=${ARROW_INSTALL_DIR}/lib
+#        -DCMAKE_INSTALL_INCLUDEDIR=${ARROW_INSTALL_DIR}/include
+#        -DCMAKE_INSTALL_BINDIR=${ARROW_INSTALL_DIR}/bin
+#        -DARROW_BUILD_SHARED=OFF
+#        -DARROW_BUILD_STATIC=ON
+#        -DARROW_BUILD_TESTS=OFF
+#        -DARROW_DEPENDENCY_SOURCE=BUNDLED
+#        -DARROW_COMPUTE=ON
+#        -DARROW_DATASET=ON
+#        -DARROW_FILESYSTEM=ON
+#        -DARROW_S3=OFF
+#        -DARROW_PARQUET=ON
+#        -DARROW_ORC=ON
+#        -DARROW_JSON=ON
+#        -DARROW_CSV=ON
+#        -DARROW_WITH_ZLIB=ON
+#        -DARROW_WITH_ZSTD=ON
+#        -DARROW_WITH_LZ4=ON
+#        -DARROW_WITH_SNAPPY=ON
+#        -DARROW_WITH_MIMALLOC=ON
+#        -DARROW_DEPENDENCY_USE_SHARED=OFF
+##        -DARROW_WITH_CURL=ON
+##        -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIR}
+##        -DCURL_LIBRARY=${CURL_LIBRARY}
+#    INSTALL_DIR ${ARROW_INSTALL_DIR}
+#    BUILD_BYPRODUCTS ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_dataset${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libparquet${CMAKE_STATIC_LIBRARY_SUFFIX}
+#)
 
-add_library(arrow::arrow_static STATIC IMPORTED GLOBAL)
+#add_library(arrow::arrow_static STATIC IMPORTED GLOBAL)
 
-file(MAKE_DIRECTORY "${ARROW_INSTALL_DIR}/include")
-set_target_properties(arrow::arrow_static PROPERTIES
-        IMPORTED_LOCATION "${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}"
-        INTERFACE_INCLUDE_DIRECTORIES ${ARROW_INSTALL_DIR}/include
+#file(MAKE_DIRECTORY "${ARROW_INSTALL_DIR}/include")
+#set_target_properties(arrow::arrow_static PROPERTIES
+#        IMPORTED_LOCATION "${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}"
+#        INTERFACE_INCLUDE_DIRECTORIES ${ARROW_INSTALL_DIR}/include
 #        INTERFACE_LINK_LIBRARIES "curlpp"
-        )
+#        )
 
 #target_link_libraries(arrow::arrow_static INTERFACE curlpp)
 
-add_dependencies(arrow::arrow_static arrow)
+#add_dependencies(arrow::arrow_static arrow)
 
 # GraphAr
 #log_stage("Setting up GraphAR...")
@@ -130,6 +130,7 @@ ExternalProject_Add(
     CMAKE_ARGS
         -DGRAPHAR_BUILD_STATIC=ON
         -DUSE_STATIC_ARROW=ON
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 #        -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}
 #        -DCURL_INCLUDE_DIR=/opt/homebrew/opt/curl/include
 #        -DCURL_LIBRARY=/opt/homebrew/opt/curl/lib/libcurl.dylib
@@ -172,66 +173,39 @@ project(${TARGET_NAME})
 include_directories(src/include)
 
 set(EXTENSION_SOURCES src/guck_extension.cpp
-        src/functions/table/hop.cpp
-        src/utils/func.cpp
-        src/utils/global_log_manager.cpp
-        src/utils/benchmark.cpp)
-
-# Убедитесь, что эти функции определены (они должны быть предоставлены DuckDB)
-if(NOT COMMAND build_static_extension)
-    message(FATAL_ERROR "build_static_extension function not found")
-endif()
-
-if(NOT COMMAND build_loadable_extension)
-    message(FATAL_ERROR "build_loadable_extension function not found")
-endif()
+        src/functions/scalar/simple.cpp)
 
 build_static_extension(${TARGET_NAME} ${EXTENSION_SOURCES})
 build_loadable_extension(${TARGET_NAME} " " ${EXTENSION_SOURCES})
 
-# Link OpenSSL in both the static library as the loadable extension
 # Добавляем зависимости, чтобы GraphAR собирался первым
-add_dependencies(${EXTENSION_NAME} arrow::arrow_static graphar::graphar_static)
-add_dependencies(${LOADABLE_EXTENSION_NAME} arrow::arrow_static graphar::graphar_static)
+add_dependencies(${EXTENSION_NAME}
+#        arrow::arrow_static
+        graphar::graphar_static)
+add_dependencies(${LOADABLE_EXTENSION_NAME}
+#        arrow::arrow_static
+        graphar::graphar_static)
 
 target_link_libraries(${EXTENSION_NAME}
-#        OpenSSL::SSL
-#        OpenSSL::Crypto
         graphar::graphar_static
-#        CURL::libcurl
-        arrow::arrow_static
-        ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}
-        ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX}
-        ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX}
-        ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX}
-        ${ARROW_LIB_DIR}/libarrow_dataset${CMAKE_STATIC_LIBRARY_SUFFIX}
-        ${ARROW_LIB_DIR}/libparquet${CMAKE_STATIC_LIBRARY_SUFFIX}
-#        lz4
-#        zstd
-#        snappy
-#        z
-#        mimalloc
-#        CURL::libcurl
+#        arrow::arrow_static
+#        ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}
+#        ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX}
+#        ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX}
+#        ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX}
+#        ${ARROW_LIB_DIR}/libarrow_dataset${CMAKE_STATIC_LIBRARY_SUFFIX}
+#        ${ARROW_LIB_DIR}/libparquet${CMAKE_STATIC_LIBRARY_SUFFIX}
         )
 
 target_link_libraries(${LOADABLE_EXTENSION_NAME}
-#        OpenSSL::SSL
-#        OpenSSL::Crypto
         graphar::graphar_static
-#        CURL::libcurl
-        arrow::arrow_static
-        ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}
-        ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX}
-        ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX}
-        ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX}
-        ${ARROW_LIB_DIR}/libarrow_dataset${CMAKE_STATIC_LIBRARY_SUFFIX}
-        ${ARROW_LIB_DIR}/libparquet${CMAKE_STATIC_LIBRARY_SUFFIX}
-#        lz4
-#        zstd
-#        snappy
-#        z
-#        mimalloc
-#        CURL::libcurl
+#        arrow::arrow_static
+#        ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX}
+#        ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX}
+#        ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX}
+#        ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX}
+#        ${ARROW_LIB_DIR}/libarrow_dataset${CMAKE_STATIC_LIBRARY_SUFFIX}
+#        ${ARROW_LIB_DIR}/libparquet${CMAKE_STATIC_LIBRARY_SUFFIX}
         )
 
 # Добавляем include директории
