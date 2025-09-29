@@ -35,6 +35,8 @@ include(ExternalProject)
 #log_stage("Configuring Apache Arrow...")
 message("Configuring Apache Arrow...")
 
+find_package(CURL REQUIRED)
+
 ExternalProject_Add(
     arrow
     PREFIX ${ARROW_PREFIX_DIR}
