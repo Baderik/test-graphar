@@ -87,6 +87,7 @@ add_dependencies(arrow::arrow_static arrow)
 # GraphAr
 #log_stage("Setting up GraphAR...")
 message("Setting up GraphAR...")
+message("VCPKG_INSTALLED_DIR: ${VCPKG_INSTALLED_DIR}")
 
 # Сначала объявим ExternalProject
 ExternalProject_Add(
@@ -99,7 +100,7 @@ ExternalProject_Add(
         -DGRAPHAR_BUILD_STATIC=ON
         -DUSE_STATIC_ARROW=ON
         -DCMAKE_INSTALL_PREFIX=${GRAPHAR_INSTALL_DIR}
-        -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR};${CMAKE_PREFIX_PATH}
+        -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR};${CMAKE_PREFIX_PATH};${VCPKG_INSTALLED_DIR}/x64-linux-release/share/curl
         -DCMAKE_BUILD_TYPE=Release
         -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
         -DProtobuf_LIBRARIES=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/lib/libprotobuf${CMAKE_STATIC_LIBRARY_SUFFIX}
