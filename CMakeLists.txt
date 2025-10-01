@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.10)  # Обновите минимальную 
 # Set extension name here
 set(TARGET_NAME guck)
 
+find_package(CURL REQUIRED)
+
 
 # =============================================
 # Core Configuration
@@ -72,7 +74,7 @@ ExternalProject_Add(
     BUILD_BYPRODUCTS ${ARROW_LIB_DIR}/libarrow${CMAKE_SHARED_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_SHARED_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_SHARED_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_SHARED_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_dataset${CMAKE_SHARED_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libparquet${CMAKE_SHARED_LIBRARY_SUFFIX}
 )
 
-    add_library(arrow::arrow_shared SHARED IMPORTED GLOBAL)
+add_library(arrow::arrow_shared SHARED IMPORTED GLOBAL)
 
 file(MAKE_DIRECTORY "${ARROW_INSTALL_DIR}/include")
 set_target_properties(arrow::arrow_shared PROPERTIES
@@ -98,8 +100,8 @@ ExternalProject_Add(
 #        -DGRAPHAR_BUILD_STATIC=ON
 #        -DUSE_STATIC_ARROW=ON
         -DCMAKE_INSTALL_PREFIX=${GRAPHAR_INSTALL_DIR}
-        -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}
-#        "-DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR};${CMAKE_PREFIX_PATH};${VCPKG_INSTALLED_DIR}/x64-linux-release/share/curl"
+#        -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}
+        "-DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR};${CMAKE_PREFIX_PATH};${VCPKG_INSTALLED_DIR}/x64-linux-release/share/curl"
         -DCMAKE_BUILD_TYPE=Release
         -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
         -DProtobuf_LIBRARIES=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/lib/libprotobuf${CMAKE_STATIC_LIBRARY_SUFFIX}
