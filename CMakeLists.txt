@@ -185,9 +185,8 @@ set(EXTENSION_INCLUDES
 target_include_directories(${EXTENSION_NAME} PUBLIC ${EXTENSION_INCLUDES} $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_include_directories(${LOADABLE_EXTENSION_NAME} PUBLIC ${EXTENSION_INCLUDES} $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-# Добавляем зависимости, чтобы GraphAR собирался первым
-add_dependencies(${EXTENSION_NAME} arrow::arrow_shared graphar::arrow_shared)
-add_dependencies(${LOADABLE_EXTENSION_NAME} arrow::arrow_shared graphar::arrow_shared)
+#add_dependencies(${EXTENSION_NAME} arrow::arrow_shared graphar::arrow_shared)
+#add_dependencies(${LOADABLE_EXTENSION_NAME} arrow::arrow_shared graphar::arrow_shared)
 
 set(EXT_LIBS
         arrow::arrow_shared
