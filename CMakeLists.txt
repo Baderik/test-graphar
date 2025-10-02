@@ -8,14 +8,41 @@ find_package(CURL REQUIRED)
 message("WE FOUND CURL: ${CURL_FOUND}")
 message("-DCURL_ROOT=${CURL_ROOT};\n-DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS};\n-DCURL_LIBRARY=${CURL_LIBRARIES}")
 
+# === Определяем CURL_ROOT вручную, если не задан ===
 if(NOT CURL_ROOT)
-    # Пробуем угадать путь к curl через brew
+    # На Ubuntu и других Linux: если curl найден в /usr, считаем, что ROOT = /usr
+    foreach(libdir ${CURL_LIBRARIES})
+        if(libdir MATCHES "^/usr/lib")
+            set(CURL_ROOT "/usr")
+            break()
+        elseif(libdir MATCHES "^/usr/local/lib")
+            set(CURL_ROOT "/usr/local")
+            break()
+        endif()
+    endforeach()
+
+    # Альтернатива: попробовать угадать по include
+    if(CURL_INCLUDE_DIRS AND NOT CURL_ROOT)
+        get_filename_component(test_root "${CURL_INCLUDE_DIRS}" DIRECTORY)
+        if("${test_root}" STREQUAL "/usr/include")
+            set(CURL_ROOT "/usr")
+        elseif("${test_root}" STREQUAL "/usr/local/include")
+            set(CURL_ROOT "/usr/local")
+        endif()
+    endif()
+endif()
+
+# На macOS — пробуем через brew, если ещё не нашли
+if(NOT CURL_ROOT AND APPLE)
     execute_process(
         COMMAND brew --prefix curl
         OUTPUT_VARIABLE CURL_ROOT
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
     )
+    if(CURL_ROOT)
+        message(STATUS "Found CURL_ROOT via brew: ${CURL_ROOT}")
+    endif()
 endif()
 
 if(NOT CURL_ROOT)
