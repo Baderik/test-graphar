@@ -5,6 +5,9 @@ set(TARGET_NAME guck)
 
 find_package(CURL REQUIRED)
 
+message("WE FOUND CURL: ${CURL_FOUND}")
+
+
 # =============================================
 # Core Configuration
 # =============================================
@@ -47,7 +50,7 @@ ExternalProject_Add(
   arrow
   PREFIX ${ARROW_PREFIX_DIR}
   GIT_REPOSITORY https://github.com/apache/arrow.git
-  GIT_TAG apache-arrow-19.0.1
+  GIT_TAG apache-arrow-17.0.0
   SOURCE_SUBDIR cpp
   CMAKE_ARGS
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
@@ -75,6 +78,10 @@ ExternalProject_Add(
     -DARROW_TESTING=OFF
 
     -DCMAKE_INSTALL_PREFIX=${ARROW_INSTALL_DIR}
+
+    -DCURL_ROOT=${CURL_ROOT}`
+    -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS}
+    -DCURL_LIBRARY=${CURL_LIBRARIES}
   BUILD_ALWAYS OFF
   INSTALL_DIR ${ARROW_INSTALL_DIR}
 )
@@ -116,6 +123,7 @@ ExternalProject_Add(
 # )
 
 add_library(arrow::arrow_shared SHARED IMPORTED GLOBAL)
+# target_link_libraries(arrow::arrow_shared PRIVATE CURL::libcurl)
 
 file(MAKE_DIRECTORY "${ARROW_INSTALL_DIR}/include")
 set_target_properties(arrow::arrow_shared PROPERTIES
@@ -141,6 +149,9 @@ ExternalProject_Add(
     -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}
     -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
     -DProtobuf_LIBRARIES=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/lib/libprotobuf.a
+    -DCURL_ROOT=${CURL_ROOT}
+    -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS}
+    -DCURL_LIBRARY=${CURL_LIBRARIES}
   INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
   DEPENDS arrow
 )
