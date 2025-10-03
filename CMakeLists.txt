@@ -7,7 +7,7 @@ find_package(CURL REQUIRED)
 
 message("WE FOUND CURL: ${CURL_FOUND}")
 message("-DCURL_ROOT=${CURL_ROOT};\n-DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS};\n-DCURL_LIBRARY=${CURL_LIBRARIES}")
-
+list(GET CURL_LIBRARIES 0 CURL_LIBRARY_FIRST)
 # === Определяем CURL_ROOT вручную, если не задан ===
 # if(NOT CURL_ROOT)
 #     # На Ubuntu и других Linux: если curl найден в /usr, считаем, что ROOT = /usr
@@ -123,7 +123,7 @@ ExternalProject_Add(
 
     # -DCURL_ROOT=${CURL_ROOT}
     -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS}
-    -DCURL_LIBRARY=/duckdb_build_dir/build/release/vcpkg_installed/x64-linux-release/lib/libcurl.a
+    -DCURL_LIBRARY=${CURL_LIBRARY_FIRST}
     # -DCMAKE_PREFIX_PATH=${CURL_ROOT}
   BUILD_ALWAYS OFF
   INSTALL_DIR ${ARROW_INSTALL_DIR}
