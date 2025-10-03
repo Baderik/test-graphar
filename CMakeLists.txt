@@ -195,6 +195,7 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 # =================================
 
+include_directories(src/include)
 set(EXTENSION_SOURCES src/guck_extension.cpp
         src/functions/table/hop.cpp
         src/utils/func.cpp
@@ -220,8 +221,8 @@ set(EXTENSION_INCLUDES
         $<BUILD_INTERFACE:${arrow_SOURCE_DIR}/cpp/src>
         )
 
-target_include_directories(${EXTENSION_NAME} PUBLIC ${EXTENSION_INCLUDES} $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-target_include_directories(${LOADABLE_EXTENSION_NAME} PUBLIC ${EXTENSION_INCLUDES} $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+# target_include_directories(${EXTENSION_NAME} PUBLIC ${EXTENSION_INCLUDES} $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+# target_include_directories(${LOADABLE_EXTENSION_NAME} PUBLIC ${EXTENSION_INCLUDES} $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 set(EXT_LIBS
   arrow::arrow_shared
