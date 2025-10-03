@@ -156,6 +156,7 @@ ExternalProject_Add(
     # "-DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR};${CURL_ROOT}"
     -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
     -DProtobuf_LIBRARIES=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/lib/libprotobuf.a
+    -DArrow_DIR=${ARROW_INSTALL_DIR}/lib/cmake/Arrow
     # -DCURL_ROOT=${CURL_ROOT}
     # -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS}
     # -DCURL_LIBRARY=${CURL_LIBRARIES}
