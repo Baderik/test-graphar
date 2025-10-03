@@ -3,53 +3,53 @@ cmake_minimum_required(VERSION 3.10)  # Обновите минимальную 
 # Set extension name here
 set(TARGET_NAME guck)
 
-find_package(CURL REQUIRED)
+# find_package(CURL REQUIRED)
 
-message("WE FOUND CURL: ${CURL_FOUND}")
-message("-DCURL_ROOT=${CURL_ROOT};\n-DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS};\n-DCURL_LIBRARY=${CURL_LIBRARIES}")
+# message("WE FOUND CURL: ${CURL_FOUND}")
+# message("-DCURL_ROOT=${CURL_ROOT};\n-DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS};\n-DCURL_LIBRARY=${CURL_LIBRARIES}")
 
 # === Определяем CURL_ROOT вручную, если не задан ===
-if(NOT CURL_ROOT)
-    # На Ubuntu и других Linux: если curl найден в /usr, считаем, что ROOT = /usr
-    foreach(libdir ${CURL_LIBRARIES})
-        if(libdir MATCHES "^/usr/lib")
-            set(CURL_ROOT "/usr")
-            break()
-        elseif(libdir MATCHES "^/usr/local/lib")
-            set(CURL_ROOT "/usr/local")
-            break()
-        endif()
-    endforeach()
+# if(NOT CURL_ROOT)
+#     # На Ubuntu и других Linux: если curl найден в /usr, считаем, что ROOT = /usr
+#     foreach(libdir ${CURL_LIBRARIES})
+#         if(libdir MATCHES "^/usr/lib")
+#             set(CURL_ROOT "/usr")
+#             break()
+#         elseif(libdir MATCHES "^/usr/local/lib")
+#             set(CURL_ROOT "/usr/local")
+#             break()
+#         endif()
+#     endforeach()
 
-    # Альтернатива: попробовать угадать по include
-    if(CURL_INCLUDE_DIRS AND NOT CURL_ROOT)
-        get_filename_component(test_root "${CURL_INCLUDE_DIRS}" DIRECTORY)
-        if("${test_root}" STREQUAL "/usr/include")
-            set(CURL_ROOT "/usr")
-        elseif("${test_root}" STREQUAL "/usr/local/include")
-            set(CURL_ROOT "/usr/local")
-        endif()
-    endif()
-endif()
+#     # Альтернатива: попробовать угадать по include
+#     if(CURL_INCLUDE_DIRS AND NOT CURL_ROOT)
+#         get_filename_component(test_root "${CURL_INCLUDE_DIRS}" DIRECTORY)
+#         if("${test_root}" STREQUAL "/usr/include")
+#             set(CURL_ROOT "/usr")
+#         elseif("${test_root}" STREQUAL "/usr/local/include")
+#             set(CURL_ROOT "/usr/local")
+#         endif()
+#     endif()
+# endif()
 
-# На macOS — пробуем через brew, если ещё не нашли
-if(NOT CURL_ROOT AND APPLE)
-    execute_process(
-        COMMAND brew --prefix curl
-        OUTPUT_VARIABLE CURL_ROOT
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_QUIET
-    )
-    if(CURL_ROOT)
-        message(STATUS "Found CURL_ROOT via brew: ${CURL_ROOT}")
-    endif()
-endif()
+# # На macOS — пробуем через brew, если ещё не нашли
+# if(NOT CURL_ROOT AND APPLE)
+#     execute_process(
+#         COMMAND brew --prefix curl
+#         OUTPUT_VARIABLE CURL_ROOT
+#         OUTPUT_STRIP_TRAILING_WHITESPACE
+#         ERROR_QUIET
+#     )
+#     if(CURL_ROOT)
+#         message(STATUS "Found CURL_ROOT via brew: ${CURL_ROOT}")
+#     endif()
+# endif()
 
-if(NOT CURL_ROOT)
-    message(FATAL_ERROR "Could not find CURL root. Please set CURL_ROOT manually.")
-endif()
+# if(NOT CURL_ROOT)
+#     message(FATAL_ERROR "Could not find CURL root. Please set CURL_ROOT manually.")
+# endif()
 
-message(STATUS "Using CURL_ROOT: ${CURL_ROOT}")
+# message(STATUS "Using CURL_ROOT: ${CURL_ROOT}")
 
 # =============================================
 # Core Configuration
@@ -121,10 +121,10 @@ ExternalProject_Add(
 
     -DCMAKE_INSTALL_PREFIX=${ARROW_INSTALL_DIR}
 
-    -DCURL_ROOT=${CURL_ROOT}
-    -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS}
-    -DCURL_LIBRARY=${CURL_LIBRARIES}
-    -DCMAKE_PREFIX_PATH=${CURL_ROOT}
+    # -DCURL_ROOT=${CURL_ROOT}
+    # -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS}
+    # -DCURL_LIBRARY=${CURL_LIBRARIES}
+    # -DCMAKE_PREFIX_PATH=${CURL_ROOT}
   BUILD_ALWAYS OFF
   INSTALL_DIR ${ARROW_INSTALL_DIR}
 )
@@ -151,12 +151,13 @@ ExternalProject_Add(
   SOURCE_SUBDIR cpp
   CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${GRAPHAR_INSTALL_DIR}
-    "-DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}-DCMAKE_PREFIX_PATH=${CURL_ROOT}"
+    -DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR}
+    # "-DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR};${CURL_ROOT}"
     -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
     -DProtobuf_LIBRARIES=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/lib/libprotobuf.a
-    -DCURL_ROOT=${CURL_ROOT}
-    -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS}
-    -DCURL_LIBRARY=${CURL_LIBRARIES}
+    # -DCURL_ROOT=${CURL_ROOT}
+    # -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS}
+    # -DCURL_LIBRARY=${CURL_LIBRARIES}
   INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
   DEPENDS arrow
 )
