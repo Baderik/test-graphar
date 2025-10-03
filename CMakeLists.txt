@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 3.10)  # Обновите минимальную 
 # Set extension name here
 set(TARGET_NAME guck)
 
-# find_package(CURL REQUIRED)
+find_package(CURL REQUIRED)
 
-# message("WE FOUND CURL: ${CURL_FOUND}")
-# message("-DCURL_ROOT=${CURL_ROOT};\n-DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS};\n-DCURL_LIBRARY=${CURL_LIBRARIES}")
+message("WE FOUND CURL: ${CURL_FOUND}")
+message("-DCURL_ROOT=${CURL_ROOT};\n-DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS};\n-DCURL_LIBRARY=${CURL_LIBRARIES}")
 
 # === Определяем CURL_ROOT вручную, если не задан ===
 # if(NOT CURL_ROOT)
