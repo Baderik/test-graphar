@@ -123,7 +123,7 @@ ExternalProject_Add(
 
     # -DCURL_ROOT=${CURL_ROOT}
     -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS}
-    -DCURL_LIBRARY=${CURL_LIBRARIES}
+    -DCURL_LIBRARY=/duckdb_build_dir/build/release/vcpkg_installed/x64-linux-release/lib/libcurl.a
     # -DCMAKE_PREFIX_PATH=${CURL_ROOT}
   BUILD_ALWAYS OFF
   INSTALL_DIR ${ARROW_INSTALL_DIR}
