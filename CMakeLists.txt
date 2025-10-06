@@ -156,14 +156,10 @@ ExternalProject_Add(
     # "-DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR};${CURL_ROOT}"
     -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
     -DProtobuf_LIBRARIES=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/lib/libprotobuf.a
-    -DArrow_FOUND=TRUE
-    -DArrow_INCLUDE_DIR=${ARROW_INSTALL_DIR}/include
-    -DArrow_LIBRARIES=${ARROW_LIB_DIR}/libarrow${CMAKE_SHARED_LIBRARY_SUFFIX}
-    -DArrow_LIBRARY=${ARROW_LIB_DIR}/libarrow${CMAKE_SHARED_LIBRARY_SUFFIX}
-    -DArrow_VERSION=17.0.0
-    # -DCURL_ROOT=${CURL_ROOT}
-    # -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS}
-    # -DCURL_LIBRARY=${CURL_LIBRARIES}
+    -DArrow_DIR=${ARROW_INSTALL_DIR}/lib/cmake/Arrow
+    -DParquet_DIR=${ARROW_INSTALL_DIR}/lib/cmake/Parquet
+    -DArrowDataset_DIR=${ARROW_INSTALL_DIR}/lib/cmake/ArrowDataset
+    -DArrowAcero_DIR=${ARROW_INSTALL_DIR}/lib/cmake/ArrowAcero
   INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
   DEPENDS arrow
   BUILD_BYPRODUCTS ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_SHARED_LIBRARY_SUFFIX}
