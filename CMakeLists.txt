@@ -1,7 +1,9 @@
-cmake_minimum_required(VERSION 3.10)  # Обновите минимальную версию
+cmake_minimum_required(VERSION 3.12)  # Обновите минимальную версию
 
 # Set extension name here
 set(TARGET_NAME guck)
+cmake_policy(SET CMP0074 NEW) 
+message("PREFIX ${CMAKE_PREFIX_PATH}")
 
 
 # =============================================
@@ -11,6 +13,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+cmake_policy(SET CMP0074 NEW)
 
 # =============================================
 # Dependency Management
@@ -37,12 +40,18 @@ message("Configuring Apache Arrow...")
 
 find_package(CURL REQUIRED)
 list(GET CURL_LIBRARIES 0 CURL_LIBRARY_FIRST)
+message(STATUS "CURL found: ${CURL_FOUND}")
+message(STATUS "CURL include: ${CURL_INCLUDE_DIRS}")
+message(STATUS "CURL lib: ${CURL_LIBRARIES}")
+message("CURL ROOT: ${CURL_ROOT}")
+# set(CURL_ROOT "/opt/homebrew/opt/curl" CACHE PATH "CURL installation prefix")
+
 
 ExternalProject_Add(
     arrow
     PREFIX ${ARROW_PREFIX_DIR}
     GIT_REPOSITORY https://github.com/apache/arrow.git
-    GIT_TAG apache-arrow-21.0.0
+    GIT_TAG apache-arrow-17.0.0
     SOURCE_SUBDIR cpp
     CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX=${ARROW_INSTALL_DIR}
@@ -70,9 +79,14 @@ ExternalProject_Add(
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
         -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}
         -DVCPKG_MANIFEST_DIR=${VCPKG_MANIFEST_DIR}
-        -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-        -DCURL_INCLUDE_DIR=${CURL_INCLUDE_DIRS}
-        -DCURL_LIBRARY=${CURL_LIBRARY_FIRST}
+        "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+        "-DCURL_FOUND=${CURL_FOUND}"
+        "-DCURL_INCLUDE_DIRS=${CURL_INCLUDE_DIRS}"
+        "-DCURL_LIBRARIES=${CURL_LIBRARIES}"
+        "-DCURL_VERSION_STRING=${CURL_VERSION_STRING}"
+        "-DCURL_ROOT=${CURL_ROOT}"
+        # "-DCMAKE_PREFIX_PATH=/opt/homebrew;/usr/local"
+        # "-DCURL_ROOT=/opt/homebrew/opt/curl"
     INSTALL_DIR ${ARROW_INSTALL_DIR}
     BUILD_BYPRODUCTS ${ARROW_LIB_DIR}/libarrow${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libarrow_dataset${CMAKE_STATIC_LIBRARY_SUFFIX} ${ARROW_LIB_DIR}/libparquet${CMAKE_STATIC_LIBRARY_SUFFIX}
 )
@@ -103,7 +117,7 @@ ExternalProject_Add(
         -DGRAPHAR_BUILD_STATIC=ON
         -DUSE_STATIC_ARROW=ON
         -DCMAKE_INSTALL_PREFIX=${GRAPHAR_INSTALL_DIR}
-        "-DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR};${CMAKE_PREFIX_PATH};${VCPKG_INSTALLED_DIR}/x64-linux-release/share/curl"
+        "-DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR};${CMAKE_PREFIX_PATH};${VCPKG_INSTALLED_DIR}/x64-linux-release/share/curl;"
         -DCMAKE_BUILD_TYPE=Release
         -DProtobuf_INCLUDE_DIR=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/include
         -DProtobuf_LIBRARIES=${ARROW_PREFIX_DIR}/src/arrow-build/protobuf_ep-install/lib/libprotobuf${CMAKE_STATIC_LIBRARY_SUFFIX}
@@ -115,7 +129,14 @@ ExternalProject_Add(
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
         -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}
         -DVCPKG_MANIFEST_DIR=${VCPKG_MANIFEST_DIR}
-#        -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+        "-DCURL_FOUND=${CURL_FOUND}"
+        "-DCURL_INCLUDE_DIRS=${CURL_INCLUDE_DIRS}"
+        "-DCURL_LIBRARIES=${CURL_LIBRARIES}"
+        "-DCURL_VERSION_STRING=${CURL_VERSION_STRING}"
+        -DCURL_ROOT=${CURL_ROOT}
+        # "-DCMAKE_PREFIX_PATH=${ARROW_INSTALL_DIR};/usr/local"
+        # "-DCURL_ROOT=/opt/homebrew/opt/curl"
+        -DCMAKE_POLICY_DEFAULT_CMP0074=NEW
     INSTALL_DIR ${GRAPHAR_INSTALL_DIR}
     BUILD_BYPRODUCTS ${GRAPHAR_LIB_DIR}/libgraphar${CMAKE_STATIC_LIBRARY_SUFFIX}
     DEPENDS arrow
